@@ -27,7 +27,18 @@ body {
     grid-template-columns: repeat(4, 1fr);
   }
 }
-// DEBUG – Klicks prüfen
-document.addEventListener("click", (e) => {
-  console.log("geklickt:", e.target);
-});
+/* === Overlay (Trinkspiel) === */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #111;
+  display: none;              /* blockiert keine Klicks */
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;              /* reicht völlig */
+}
+
+/* sichtbar, wenn aktiv */
+.overlay.active {
+  display: flex;
+}
