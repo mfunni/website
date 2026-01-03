@@ -1,0 +1,29 @@
+/* Grundlayout */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Handy: 2 Spalten */
+  gap: 12px;
+  padding: 12px;
+}
+
+.tile {
+  border: 2px solid #333;
+  border-radius: 10px;
+  aspect-ratio: 1 / 1; /* macht die Felder quadratisch */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* PC: ab 900px Breite 4 Spalten */
+@media (min-width: 900px) {
+  #grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
