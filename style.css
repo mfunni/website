@@ -27,3 +27,7 @@ body {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+#panel {
+  border: 2px solid red;
+  margin: 12px;
+}
