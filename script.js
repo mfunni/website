@@ -1,3 +1,3 @@
 document.getElementById("tile-1").addEventListener("click", function () {
-  alert("Feld 1 wurde geklickt!");
+  document.getElementById("panel").style.display = "block";
 });
