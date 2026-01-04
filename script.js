@@ -107,12 +107,15 @@ document.getElementById("answers").addEventListener("click", function (e) {
   const picked = btn.getAttribute("data-answer");
 
   if (picked === currentQuestion.correct) {
-    document.getElementById("status").textContent =
-      `✅ Richtig! ${currentQuestion.correct} ist die Hauptstadt von ${currentQuestion.country}.`;
-  } else {
-    document.getElementById("status").textContent =
-      `❌ Falsch! Richtig ist: ${currentQuestion.correct}.`;
-  }
+  const randomPlayer = Math.floor(Math.random() * playerCount) + 1;
+
+  document.getElementById("status").textContent =
+    `✅ Richtig! Spieler ${randomPlayer} trinkt 🍺`;
+} else {
+  document.getElementById("status").textContent =
+    `❌ Falsch! Du trinkst 🍻 (Richtig wäre: ${currentQuestion.correct})`;
+}
+
 });
 
 // -------------------------
