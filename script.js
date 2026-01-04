@@ -4,7 +4,7 @@
 let playerCount = 0;
 let currentIndex = 0;
 let currentQuestion = null;
-let currentOptions = [];
+
 // -------------------------
 // Fragenpool Europa (Hauptstädte)
 // -------------------------
@@ -55,7 +55,7 @@ const questions = [
 ];
 
 // -------------------------
-// Helfer: Shuffle + Optionen bauen (richtige Antwort nicht immer gleich)
+// Helfer: Shuffle + Optionen bauen
 // -------------------------
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -70,23 +70,21 @@ function buildOptions(q) {
 }
 
 // -------------------------
-// UI: Frage rendern (in #game)
-// Voraussetzung: In deinem HTML gibt es #game (div) und #status (p)
+// UI: Frage rendern
+// Voraussetzungen im HTML:
+// #question-text, #answers, #status
 // -------------------------
 function renderQuestion() {
   currentQuestion = questions[currentIndex];
-  currentOptions = buildOptions(currentQuestion);
+  const options = buildOptions(currentQuestion);
 
-  // Frage anzeigen
   document.getElementById("question-text").textContent =
     `Frage ${currentIndex + 1}/${questions.length}: Was ist die Hauptstadt von ${currentQuestion.country}?`;
 
-  // Status zurücksetzen
   document.getElementById("status").textContent = "Wähle A–D:";
 
-  // Antworten rendern
   const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = currentOptions
+  answersDiv.innerHTML = options
     .map((opt, idx) => {
       const letter = ["A", "B", "C", "D"][idx];
       return `
@@ -98,6 +96,10 @@ function renderQuestion() {
     })
     .join("");
 }
+
+// -------------------------
+// Antworten-Klick (Event Delegation)
+// -------------------------
 document.getElementById("answers").addEventListener("click", function (e) {
   const btn = e.target.closest(".answer-btn");
   if (!btn || !currentQuestion) return;
@@ -113,64 +115,40 @@ document.getElementById("answers").addEventListener("click", function (e) {
   }
 });
 
-
-  const game = document.getElementById("game");
-  const status = document.getElementById("status");
-
-  document.getElementById("question-text").textContent =
-  `Frage ${currentIndex + 1}/${questions.length}: Was ist die Hauptstadt von ${q.country}?`;
-status.textContent = "Wähle A–D:";
-
-
-  // Wir bauen die Antwortbuttons dynamisch in #game
-  // (dein #next-question Button bleibt unten weiterhin vorhanden)
-  const answersHtml = options
-    .map((opt, idx) => {
-      const letter = ["A", "B", "C", "D"][idx];
-      return `<button class="answer-btn" data-answer="${opt}" style="display:block; width:100%; margin:10px 0; padding:12px; font-size:16px;">
-        ${letter}: ${opt}
-      </button>`;
-    })
-    .join("");
-
-  // Wir behalten den Next-Button am Ende (falls er bei dir schon existiert)
-  const nextBtn = document.getElementById("next-question");
-
-  // Inhalt setzen: Antworten oben, Next-Button darunter
-  game.innerHTML = `
-    <div id="answers">
-      ${answersHtml}
-    </div>
-  `;
-
-  // Next-Button wieder anhängen (falls vorhanden)
-  if (nextBtn) game.appendChild(nextBtn);
-
-  // Klick-Listener für Antworten (nur Anzeige richtig/falsch — Trinken kommt später)
-  document.querySelectorAll(".answer-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const picked = this.getAttribute("data-answer");
-      if (picked === q.correct) {
-        status.textContent = `✅ Richtig! ${q.correct} ist die Hauptstadt von ${q.country}.`;
-      } else {
-        status.textContent = `❌ Falsch! Richtig ist: ${q.correct}.`;
-      }
-    });
-  });
-}
-
 // -------------------------
 // Overlay öffnen/schließen + Inhalte für Feld 1 und Feld 8
+// Voraussetzungen im HTML:
+// #overlay, #overlay-title, #overlay-text, #setup, #game, #game-message,
+// #player-count, #question-text, #answers, #status
 // -------------------------
 document.getElementById("tile-1").addEventListener("click", function () {
   document.getElementById("overlay-title").textContent = "Trinkspiel";
-  document.getElementById("overlay-text").textContent = "Bitte Spieleranzahl eingeben:";
+  document.getElementById("overlay-text").textContent = "";
+
+  // Reset auf Setup-Ansicht
+  document.getElementById("setup").style.display = "block";
+  document.getElementById("game").style.display = "none";
+  document.getElementById("game-message").textContent = "";
+  document.getElementById("player-count").value = "";
+  document.getElementById("question-text").textContent = "";
+  document.getElementById("answers").innerHTML = "";
+  document.getElementById("status").textContent = "";
+
   document.getElementById("overlay").style.display = "block";
 });
 
 document.getElementById("tile-8").addEventListener("click", function () {
   document.getElementById("overlay-title").textContent = "Ragna ist cool!";
   document.getElementById("overlay-text").textContent = "";
+
+  // Setup/Game ausblenden
+  document.getElementById("setup").style.display = "none";
+  document.getElementById("game").style.display = "none";
+  document.getElementById("game-message").textContent = "";
+  document.getElementById("question-text").textContent = "";
+  document.getElementById("answers").innerHTML = "";
+  document.getElementById("status").textContent = "";
+
   document.getElementById("overlay").style.display = "block";
 });
 
@@ -179,8 +157,7 @@ document.getElementById("close").addEventListener("click", function () {
 });
 
 // -------------------------
-// Start-Button: Spieleranzahl speichern + Setup ausblenden + Game einblenden
-// Voraussetzung: HTML hat #setup, #game, #player-count, #start-game, #game-message, #status
+// Start: Spieleranzahl speichern + Spiel anzeigen + erste Frage
 // -------------------------
 document.getElementById("start-game").addEventListener("click", function () {
   const count = Number(document.getElementById("player-count").value);
@@ -193,10 +170,6 @@ document.getElementById("start-game").addEventListener("click", function () {
     document.getElementById("setup").style.display = "none";
     document.getElementById("game").style.display = "block";
 
-    document.getElementById("status").textContent =
-      "Spiel läuft mit " + playerCount + " Spielern.";
-
-    // Direkt erste Frage anzeigen
     renderQuestion();
   } else {
     message.textContent = "Bitte eine Zahl zwischen 1 und 9 eingeben.";
@@ -204,8 +177,7 @@ document.getElementById("start-game").addEventListener("click", function () {
 });
 
 // -------------------------
-// Nächste Frage: Index erhöhen und neue Frage anzeigen
-// Voraussetzung: HTML hat Button #next-question
+// Nächste Frage
 // -------------------------
 document.getElementById("next-question").addEventListener("click", function () {
   currentIndex++;
