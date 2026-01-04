@@ -12,3 +12,14 @@ document.getElementById("tile-8").addEventListener("click", function () {
   document.getElementById("overlay-text").textContent = "";
   document.getElementById("overlay").style.display = "block";
 });
+document.getElementById("start-game").addEventListener("click", function () {
+  const count = Number(document.getElementById("player-count").value);
+  const message = document.getElementById("game-message");
+
+  if (count >= 1 && count <= 9) {
+    message.textContent = "Spiel gestartet mit " + count + " Spielern.";
+  } else {
+    message.textContent = "Bitte eine Zahl zwischen 1 und 9 eingeben.";
+  }
+});
+
