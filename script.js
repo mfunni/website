@@ -3,7 +3,8 @@
 // -------------------------
 let playerCount = 0;
 let currentIndex = 0;
-
+let currentQuestion = null;
+let currentOptions = [];
 // -------------------------
 // Fragenpool Europa (Hauptstädte)
 // -------------------------
@@ -73,8 +74,45 @@ function buildOptions(q) {
 // Voraussetzung: In deinem HTML gibt es #game (div) und #status (p)
 // -------------------------
 function renderQuestion() {
-  const q = questions[currentIndex];
-  const options = buildOptions(q);
+  currentQuestion = questions[currentIndex];
+  currentOptions = buildOptions(currentQuestion);
+
+  // Frage anzeigen
+  document.getElementById("question-text").textContent =
+    `Frage ${currentIndex + 1}/${questions.length}: Was ist die Hauptstadt von ${currentQuestion.country}?`;
+
+  // Status zurücksetzen
+  document.getElementById("status").textContent = "Wähle A–D:";
+
+  // Antworten rendern
+  const answersDiv = document.getElementById("answers");
+  answersDiv.innerHTML = currentOptions
+    .map((opt, idx) => {
+      const letter = ["A", "B", "C", "D"][idx];
+      return `
+        <button class="answer-btn" data-answer="${opt}"
+          style="display:block; width:100%; margin:10px 0; padding:12px; font-size:16px;">
+          ${letter}: ${opt}
+        </button>
+      `;
+    })
+    .join("");
+}
+document.getElementById("answers").addEventListener("click", function (e) {
+  const btn = e.target.closest(".answer-btn");
+  if (!btn || !currentQuestion) return;
+
+  const picked = btn.getAttribute("data-answer");
+
+  if (picked === currentQuestion.correct) {
+    document.getElementById("status").textContent =
+      `✅ Richtig! ${currentQuestion.correct} ist die Hauptstadt von ${currentQuestion.country}.`;
+  } else {
+    document.getElementById("status").textContent =
+      `❌ Falsch! Richtig ist: ${currentQuestion.correct}.`;
+  }
+});
+
 
   const game = document.getElementById("game");
   const status = document.getElementById("status");
