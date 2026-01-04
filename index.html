@@ -26,8 +26,18 @@
       z-index: 1000;
     ">
   <h1 id="overlay-title">Trinkspiel</h1>
-  <p id="overlay-text">Hier kommt gleich die Eingabe der Spieleranzahl.</p>
-  <button id="close">Zurück</button>
+<p id="overlay-text">Bitte Spieleranzahl eingeben:</p>
+<input
+  id="player-count"
+  type="number"
+  min="1"
+  max="9"
+  placeholder="1–9"
+/>
+<br><br>
+<button id="start-game">Start</button>
+<button id="close">Zurück</button>
+<p id="game-message"></p>
 </div>
    <script src="script.js?v=2"></script>     
 </body>
