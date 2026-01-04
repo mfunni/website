@@ -79,7 +79,10 @@ function renderQuestion() {
   const game = document.getElementById("game");
   const status = document.getElementById("status");
 
-  status.textContent = `Frage ${currentIndex + 1}/${questions.length}: Hauptstadt von ${q.country}?`;
+  document.getElementById("question-text").textContent =
+  `Frage ${currentIndex + 1}/${questions.length}: Was ist die Hauptstadt von ${q.country}?`;
+status.textContent = "Wähle A–D:";
+
 
   // Wir bauen die Antwortbuttons dynamisch in #game
   // (dein #next-question Button bleibt unten weiterhin vorhanden)
