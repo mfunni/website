@@ -16,27 +16,51 @@
     <div class="tile">Feld 6</div>
     <div class="tile">Feld 7</div>
     <div class="tile" id="tile-8">Feld 8</div>
- </div>
-    <div id="overlay" style="
-      display:none;
-      position: fixed;
-      inset: 0;
-      background: white;
-      padding: 20px;
-      z-index: 1000;
-    ">
+<div id="overlay" style="
+  display:none;
+  position: fixed;
+  inset: 0;
+  background: white;
+  padding: 20px;
+  z-index: 1000;
+">
+
   <h1 id="overlay-title">Trinkspiel</h1>
-<p id="overlay-text">Bitte Spieleranzahl eingeben:</p>
-<input
-  id="player-count"
-  type="number"
-  min="1"
-  max="9"
-  placeholder="1–9"
-/>
-<br><br>
-<button id="start-game">Start</button>
-<button id="close">Zurück</button>
+  <p id="overlay-text"></p>
+
+  <!-- Setup -->
+  <div id="setup">
+    <p>Bitte Spieleranzahl eingeben:</p>
+
+    <input
+      id="player-count"
+      type="number"
+      min="1"
+      max="9"
+      placeholder="1–9"
+    />
+
+    <br><br>
+
+    <button id="start-game">Start</button>
+    <p id="game-message"></p>
+  </div>
+
+  <!-- Game -->
+  <div id="game" style="display:none;">
+    <p id="question-text"></p>
+
+    <div id="answers"></div>
+
+    <p id="status"></p>
+
+    <button id="next-question">Nächste Frage</button>
+  </div>
+
+  <button id="close">Zurück</button>
+
+</div>
+
 <div id="setup">
   <p id="game-message"></p>
 </div>
