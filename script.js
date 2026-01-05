@@ -194,7 +194,15 @@ let gameOver = false;
 
 function renderField2() {
   overlayTitle.textContent = "🎲 Glücksspiel";
-  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
+  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>
+🎲 Spielregeln
+Du startest mit 10 Münzen.
+In jeder Runde kannst du einen Einsatz wählen:
+Schwarz oder Weiß → Gewinn/Verlust ±1 Münze
+Eine Zahl von 1–10 → Treffer: +10 Münzen Daneben: −1 Münze
+Das Spiel endet, wenn:
+du 50 Münzen erreichst → ✅ gewonnen
+du 0 Münzen hast → ❌ verloren</small>`;
 
   // Trinkspiel-UI ausblenden
   document.getElementById("setup").style.display = "none";
