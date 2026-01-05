@@ -308,7 +308,7 @@ function betNumber(chosen) {
 }
 
 function updateGame() {
-  overlayText.textContent = `💰 Münzen: ${coins}`;
+  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
 
   if (coins >= 50) {
     gameOver = true;
