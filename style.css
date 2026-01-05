@@ -50,11 +50,9 @@ body {
   justify-content: center;
 }
 #tile-1 img {
-  max-width: 50%;
-  max-height: 50%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
   display: block;
 }
 
