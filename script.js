@@ -219,8 +219,23 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ===============================
-// Feld 2 – Glücksspiel
+// Feld 2 – Glücksspiel (robust, ohne ID-Kollisionen)
 // ===============================
+const overlay = document.getElementById("overlay");
+const overlayTitle = document.getElementById("overlay-title");
+const overlayText = document.getElementById("overlay-text");
+const overlayContent = document.getElementById("overlay-content");
+
+function openOverlay() {
+  overlay.style.display = "block";
+}
+
+function closeOverlay() {
+  overlay.style.display = "none";
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
+}
+
 let coins = 10;
 let gameOver = false;
 
@@ -230,53 +245,46 @@ function renderField2() {
 
   overlayContent.innerHTML = `
     <div style="margin-top:16px; display:grid; gap:14px;">
-      
+
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <button id="bet-black">⚫ Schwarz</button>
-        <button id="bet-white">⚪ Weiß</button>
+        <button id="field2-bet-black">⚫ Schwarz</button>
+        <button id="field2-bet-white">⚪ Weiß</button>
       </div>
 
-      <div id="result" style="min-height:24px;">Wähle einen Einsatz.</div>
+      <div id="field2-result" style="min-height:24px;">Wähle einen Einsatz.</div>
 
       <div>
         <div style="margin-bottom:8px;">🔢 Zahl 1–10</div>
-        <div id="num-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px;">
+        <div id="field2-num-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px;">
           ${Array.from({ length: 10 }, (_, i) =>
-            `<button class="num-btn" data-num="${i + 1}">${i + 1}</button>`
+            `<button class="field2-num-btn" data-num="${i + 1}">${i + 1}</button>`
           ).join("")}
         </div>
       </div>
 
-      <button id="restart">🔄 Neustart</button>
-      <button id="close">❌ Schließen</button>
+      <button id="field2-restart">🔄 Neustart</button>
+      <button id="field2-close">❌ Schließen</button>
     </div>
   `;
 
-  // Farbe setzen
-  document.getElementById("bet-black").addEventListener("click", () => betColor());
-  document.getElementById("bet-white").addEventListener("click", () => betColor());
+  document.getElementById("field2-bet-black").addEventListener("click", betColor);
+  document.getElementById("field2-bet-white").addEventListener("click", betColor);
 
-  // Zahlen setzen (Event Delegation)
-  document.getElementById("num-grid").addEventListener("click", (e) => {
-    const btn = e.target.closest(".num-btn");
+  document.getElementById("field2-num-grid").addEventListener("click", (e) => {
+    const btn = e.target.closest(".field2-num-btn");
     if (!btn) return;
     betNumber(Number(btn.dataset.num));
   });
 
-  document.getElementById("restart").addEventListener("click", resetGame);
-  document.getElementById("close").addEventListener("click", closeOverlay);
+  document.getElementById("field2-restart").addEventListener("click", resetGame);
+  document.getElementById("field2-close").addEventListener("click", closeOverlay);
 }
 
-// ===============================
-// Spiel-Logik
-// ===============================
 function betColor() {
   if (gameOver || coins < 1) return;
 
   coins += Math.random() < 0.5 ? 1 : -1;
-  document.getElementById("result").textContent =
-    coins > 0 ? "Farbe gespielt." : "Letzter Einsatz.";
-
+  document.getElementById("field2-result").textContent = "Farbe gespielt.";
   updateGame();
 }
 
@@ -287,11 +295,11 @@ function betNumber(chosen) {
 
   if (chosen === drawn) {
     coins += 10;
-    document.getElementById("result").textContent =
+    document.getElementById("field2-result").textContent =
       `🎉 Treffer! Die ${drawn} war richtig (+10)`;
   } else {
     coins -= 1;
-    document.getElementById("result").textContent =
+    document.getElementById("field2-result").textContent =
       `❌ Daneben. Gezogene Zahl: ${drawn} (−1)`;
   }
 
@@ -303,13 +311,11 @@ function updateGame() {
 
   if (coins >= 50) {
     gameOver = true;
-    document.getElementById("result").textContent =
+    document.getElementById("field2-result").textContent =
       "🎉 Glückwunsch! Du hast 50 Münzen erreicht!";
-  }
-
-  if (coins <= 0) {
+  } else if (coins <= 0) {
     gameOver = true;
-    document.getElementById("result").textContent =
+    document.getElementById("field2-result").textContent =
       "💀 Keine Münzen mehr – Spiel vorbei.";
   }
 }
@@ -320,12 +326,13 @@ function resetGame() {
   renderField2();
 }
 
-// ===============================
-// Feld 2 Tile Klick
-// ===============================
-document.getElementById("tile-2").addEventListener("click", () => {
-  resetGame();
-  openOverlay();
+// Listener sicher setzen (auch wenn später umgebaut wird)
+document.addEventListener("DOMContentLoaded", () => {
+  const tile2 = document.getElementById("tile-2");
+  if (!tile2) return;
+
+  tile2.addEventListener("click", () => {
+    resetGame();
+    openOverlay();
+  });
 });
-
-
