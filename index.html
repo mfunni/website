@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Meine Seite</title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- CSS nur einmal, mit Version -->
+    <link rel="stylesheet" href="style.css?v=25">
   </head>
 
   <body>
@@ -13,7 +15,6 @@
         <img src="trinkspiel-icon.png" alt="Trinkspiel">
       </div>
 
-      <div id="grid">
       <div class="tile" id="tile-2">
         <img src="Roulette-icon.png" alt="Feld2">
       </div>
@@ -23,7 +24,6 @@
       <div class="tile" id="tile-5">Feld 5</div>
       <div class="tile" id="tile-6">Feld 6</div>
       <div class="tile" id="tile-7">Feld 7</div>
-
       <div class="tile" id="tile-8">Feld 8</div>
     </div>
 
@@ -47,15 +47,9 @@
           Richtige Antwort: Ein zufällig ausgewählter Spieler trinkt.
         </p>
 
-        <input
-          id="player-count"
-          type="number"
-          min="1"
-          max="9"
-          placeholder="1–9"
-        />
-
+        <input id="player-count" type="number" min="1" max="9" placeholder="1–9" />
         <br><br>
+
         <button id="start-game">Start</button>
         <p id="game-message"></p>
       </div>
@@ -71,7 +65,7 @@
       <button id="close">Zurück</button>
     </div>
 
-    <link rel="stylesheet" href="style.css?v=25">
-<script src="script.js?v=25"></script>
+    <!-- JS nur einmal, ganz unten -->
+    <script src="script.js?v=25"></script>
   </body>
 </html>
