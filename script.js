@@ -242,10 +242,7 @@ let gameOver = false;
 function renderField2() {
   overlayTitle.textContent = "🎲 Glücksspiel";
   overlayText.innerHTML = `
-  💰 Münzen: ${coins}<br>
-  <small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>
-`;
-
+ overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
 
   overlayContent.innerHTML = `
     <div style="margin-top:16px; display:grid; gap:14px;">
