@@ -56,3 +56,15 @@ body {
   display: block;
 }
 
+#tile-2 {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#tile-2 img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block;
+}
