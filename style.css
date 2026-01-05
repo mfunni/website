@@ -19,6 +19,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 18px;
+  overflow: hidden;
 }
 
 /* PC: ab 900px Breite 4 Spalten */
@@ -42,9 +43,14 @@ body {
 .overlay.active {
   display: flex;
 }
-.title img {
-  width: 70%;
-  height: auto;
-  object-fit: contain;
+#title-1 {
+  overflow: hidden;
 }
+#title-1 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 
