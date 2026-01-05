@@ -43,13 +43,13 @@ body {
 .overlay.active {
   display: flex;
 }
-#title-1 {
+#tile-1 {
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-#title-1 img {
+#tile-1 img {
   max-width: 50%;
   max-height: 50%;
   width: auto;
