@@ -202,7 +202,7 @@ Schwarz oder Weiß → Gewinn/Verlust ±1 Münze<br>
 Eine Zahl von 1–10 → Treffer: +10 Münzen Daneben: −1 Münze<br>
 Das Spiel endet, wenn:<br>
 du 50 Münzen erreichst → ✅ gewonnen<br>
-du 0 Münzen hast → ❌ verloren</small>`;<br>
+du 0 Münzen hast → ❌ verloren</small<br>>`;
 
   // Trinkspiel-UI ausblenden
   document.getElementById("setup").style.display = "none";
