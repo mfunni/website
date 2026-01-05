@@ -1,70 +1,168 @@
-/* Grundlayout */
+/* =========================
+   Grundlayout
+   ========================= */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #000;
 }
 
+/* =========================
+   Grid (Kacheln)
+   ========================= */
 #grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Handy: 2 Spalten */
+  grid-template-columns: repeat(2, 1fr); /* Mobile: 2x4 */
   gap: 12px;
   padding: 12px;
 }
 
-.tile {
-  border: 2px solid #333;
-  border-radius: 10px;
-  aspect-ratio: 1 / 1; /* macht die Felder quadratisch */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  overflow: hidden;
-}
-
-/* PC: ab 900px Breite 4 Spalten */
+/* Desktop: 4x2 */
 @media (min-width: 900px) {
   #grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
-/* === Overlay (Trinkspiel) === */
+
+/* =========================
+   Tiles
+   ========================= */
+.tile {
+  border: 2px solid #333;
+  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  background: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.tile:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.tile:active {
+  transform: scale(0.98);
+}
+
+/* Bilder in Tiles */
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* =========================
+   Overlay
+   ========================= */
 .overlay {
   position: fixed;
   inset: 0;
-  background: #111;
-  display: none;              /* blockiert keine Klicks */
+  background: rgba(0,0,0,0.9);
+
+  display: none;
   align-items: center;
   justify-content: center;
-  z-index: 1000;              /* reicht völlig */
+
+  z-index: 1000;
+  pointer-events: none; /* blockiert nichts im AUS-Zustand */
 }
 
-/* sichtbar, wenn aktiv */
+/* Overlay sichtbar */
 .overlay.active {
   display: flex;
-}
-#tile-1 {
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#tile-1 img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  display: block;
+  pointer-events: auto;
 }
 
-#tile-2 {
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* =========================
+   Overlay Inhalt
+   ========================= */
+#overlay {
+  padding: 20px;
 }
-#tile-2 img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  display: block;
+
+#overlay-title {
+  margin-top: 0;
+  color: #fff;
+}
+
+#overlay-text {
+  color: #ddd;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* zentrierter Inhalt */
+#overlay-content {
+  color: #fff;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* =========================
+   Buttons allgemein
+   ========================= */
+button {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   Feld 2 – Glücksspiel
+   ========================= */
+#overlay-content button {
+  background: #222;
+  color: #fff;
+}
+
+#overlay-content button:hover {
+  background: #333;
+}
+
+/* =========================
+   Trinkspiel
+   ========================= */
+#setup,
+#game {
+  color: #fff;
+}
+
+#answers button {
+  width: 100%;
+  margin: 8px 0;
+}
+
+/* =========================
+   Zurück-Button
+   ========================= */
+#close {
+  margin-top: 20px;
+  background: #444;
+  color: #fff;
+}
+
+#close:hover {
+  background: #666;
 }
