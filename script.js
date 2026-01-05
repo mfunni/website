@@ -1,13 +1,59 @@
-// -------------------------
-// Spiel-Zustand
-// -------------------------
+// ===============================
+// Gemeinsame Overlay-Refs + Funktionen
+// ===============================
+const overlay = document.getElementById("overlay");
+const overlayTitle = document.getElementById("overlay-title");
+const overlayText = document.getElementById("overlay-text");
+const overlayContent = document.getElementById("overlay-content");
+
+// Trinkspiel-UI-Refs
+const setupEl = document.getElementById("setup");
+const gameEl = document.getElementById("game");
+const gameMessageEl = document.getElementById("game-message");
+const playerCountEl = document.getElementById("player-count");
+const questionTextEl = document.getElementById("question-text");
+const answersEl = document.getElementById("answers");
+const statusEl = document.getElementById("status");
+const startGameBtn = document.getElementById("start-game");
+const nextQuestionBtn = document.getElementById("next-question");
+
+// Close-Button aus deinem HTML
+const closeBtn = document.getElementById("close");
+
+function openOverlay() {
+  overlay.style.display = "block";
+}
+
+function closeOverlay() {
+  overlay.style.display = "none";
+
+  // Overlay-Text/Content zurücksetzen
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
+
+  // Trinkspiel-UI aufräumen
+  if (setupEl) setupEl.style.display = "none";
+  if (gameEl) gameEl.style.display = "none";
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeOverlay();
+});
+
+if (closeBtn) {
+  closeBtn.addEventListener("click", closeOverlay);
+}
+
+// ===============================
+// Feld 1 – Trinkspiel: Zustand
+// ===============================
 let playerCount = 0;
 let currentIndex = 0;
 let currentQuestion = null;
 
-// -------------------------
-// Fragenpool Europa (Hauptstädte)
-// -------------------------
+// ===============================
+// Feld 1 – Fragenpool Europa (Hauptstädte)
+// ===============================
 const questions = [
   { country: "Albanien", correct: "Tirana", wrong: ["Skopje", "Sofia", "Podgorica"] },
   { country: "Andorra", correct: "Andorra la Vella", wrong: ["Vaduz", "Monaco", "San Marino"] },
@@ -54,9 +100,6 @@ const questions = [
   { country: "Zypern", correct: "Nikosia", wrong: ["Athen", "Valletta", "Ankara"] },
 ];
 
-// -------------------------
-// Helfer: Shuffle + Optionen bauen
-// -------------------------
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -69,22 +112,16 @@ function buildOptions(q) {
   return shuffle([q.correct, ...q.wrong]);
 }
 
-// -------------------------
-// UI: Frage rendern
-// Voraussetzungen im HTML:
-// #question-text, #answers, #status
-// -------------------------
 function renderQuestion() {
   currentQuestion = questions[currentIndex];
   const options = buildOptions(currentQuestion);
 
-  document.getElementById("question-text").textContent =
+  questionTextEl.textContent =
     `Frage ${currentIndex + 1}/${questions.length}: Was ist die Hauptstadt von ${currentQuestion.country}?`;
 
-  document.getElementById("status").textContent = "Wähle A–D:";
+  statusEl.textContent = "Wähle A–D:";
 
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = options
+  answersEl.innerHTML = options
     .map((opt, idx) => {
       const letter = ["A", "B", "C", "D"][idx];
       return `
@@ -97,96 +134,44 @@ function renderQuestion() {
     .join("");
 }
 
-// -------------------------
-// Antworten-Klick (Event Delegation)
-// -------------------------
-document.getElementById("answers").addEventListener("click", function (e) {
+// Antworten Klick (Delegation)
+answersEl.addEventListener("click", (e) => {
   const btn = e.target.closest(".answer-btn");
   if (!btn || !currentQuestion) return;
 
   const picked = btn.getAttribute("data-answer");
 
   if (picked === currentQuestion.correct) {
-  const randomPlayer = Math.floor(Math.random() * playerCount) + 1;
-
-  document.getElementById("status").textContent =
-    `✅ Richtig! Spieler ${randomPlayer} trinkt 🍺`;
-} else {
-  document.getElementById("status").textContent =
-    `❌ Falsch! Du trinkst 🍻 (Richtig wäre: ${currentQuestion.correct})`;
-}
-
+    const randomPlayer = Math.floor(Math.random() * playerCount) + 1;
+    statusEl.textContent = `✅ Richtig! Spieler ${randomPlayer} trinkt 🍺`;
+  } else {
+    statusEl.textContent = `❌ Falsch! Du trinkst 🍻 (Richtig wäre: ${currentQuestion.correct})`;
+  }
 });
 
-// -------------------------
-// Overlay öffnen/schließen + Inhalte für Feld 1 und Feld 8
-// Voraussetzungen im HTML:
-// #overlay, #overlay-title, #overlay-text, #setup, #game, #game-message,
-// #player-count, #question-text, #answers, #status
-// -------------------------
-document.getElementById("tile-1").addEventListener("click", function () {
-  document.getElementById("overlay-title").textContent = "Trinkspiel";
-  document.getElementById("overlay-text").textContent = "";
-
-  // Reset auf Setup-Ansicht
-  document.getElementById("setup").style.display = "block";
-  document.getElementById("game").style.display = "none";
-  document.getElementById("game-message").textContent = "";
-  document.getElementById("player-count").value = "";
-  document.getElementById("question-text").textContent = "";
-  document.getElementById("answers").innerHTML = "";
-  document.getElementById("status").textContent = "";
-
-  document.getElementById("overlay").style.display = "block";
-});
-
-document.getElementById("tile-8").addEventListener("click", function () {
-  document.getElementById("overlay-title").textContent = "Ragna ist cool!";
-  document.getElementById("overlay-text").textContent = "";
-
-  // Setup/Game ausblenden
-  document.getElementById("setup").style.display = "none";
-  document.getElementById("game").style.display = "none";
-  document.getElementById("game-message").textContent = "";
-  document.getElementById("question-text").textContent = "";
-  document.getElementById("answers").innerHTML = "";
-  document.getElementById("status").textContent = "";
-
-  document.getElementById("overlay").style.display = "block";
-});
-
-document.getElementById("close").addEventListener("click", function () {
-  document.getElementById("overlay").style.display = "none";
-});
-
-// -------------------------
-// Start: Spieleranzahl speichern + Spiel anzeigen + erste Frage
-// -------------------------
-document.getElementById("start-game").addEventListener("click", function () {
-  const count = Number(document.getElementById("player-count").value);
-  const message = document.getElementById("game-message");
+// Start Trinkspiel
+startGameBtn.addEventListener("click", () => {
+  const count = Number(playerCountEl.value);
 
   if (count >= 1 && count <= 9) {
     playerCount = count;
     currentIndex = 0;
 
-    document.getElementById("setup").style.display = "none";
-    document.getElementById("game").style.display = "block";
+    setupEl.style.display = "none";
+    gameEl.style.display = "block";
 
     renderQuestion();
   } else {
-    message.textContent = "Bitte eine Zahl zwischen 1 und 9 eingeben.";
+    gameMessageEl.textContent = "Bitte eine Zahl zwischen 1 und 9 eingeben.";
   }
 });
 
-// -------------------------
 // Nächste Frage
-// -------------------------
-document.getElementById("next-question").addEventListener("click", function () {
+nextQuestionBtn.addEventListener("click", () => {
   currentIndex++;
 
   if (currentIndex >= questions.length) {
-    document.getElementById("status").textContent = "✅ Ende! Alle Fragen durch.";
+    statusEl.textContent = "✅ Ende! Alle Fragen durch.";
     return;
   }
 
@@ -194,27 +179,132 @@ document.getElementById("next-question").addEventListener("click", function () {
 });
 
 // ===============================
-// Overlay-Referenzen
+// Feld 1 – Tile Klick
 // ===============================
-const overlay = document.getElementById("overlay");
-const overlayTitle = document.getElementById("overlay-title");
-const overlayText = document.getElementById("overlay-text");
-const overlayContent = document.getElementById("overlay-content");
-
-// ===============================
-// Overlay öffnen / schließen
-// ===============================
-function openOverlay() {
-  overlay.style.display = "block";
-}
-
-function closeOverlay() {
-  overlay.style.display = "none";
+document.getElementById("tile-1").addEventListener("click", () => {
+  overlayTitle.textContent = "Trinkspiel";
   overlayText.textContent = "";
-  overlayContent.innerHTML = "";
-}
+  overlayContent.innerHTML = ""; // Feld 2 content weg
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeOverlay();
+  // Setup anzeigen, Game ausblenden
+  setupEl.style.display = "block";
+  gameEl.style.display = "none";
+
+  // Reset UI
+  gameMessageEl.textContent = "";
+  playerCountEl.value = "";
+  questionTextEl.textContent = "";
+  answersEl.innerHTML = "";
+  statusEl.textContent = "";
+
+  openOverlay();
 });
 
+// ===============================
+// Feld 8 – Tile Klick
+// ===============================
+document.getElementById("tile-8").addEventListener("click", () => {
+  overlayTitle.textContent = "Ragna ist cool!";
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
+
+  setupEl.style.display = "none";
+  gameEl.style.display = "none";
+
+  openOverlay();
+});
+
+// ===============================
+// Feld 2 – Glücksspiel
+// ===============================
+let coins = 10;
+let gameOver = false;
+
+function renderField2() {
+  overlayTitle.textContent = "🎲 Glücksspiel";
+  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
+
+  // Trinkspiel ausblenden
+  setupEl.style.display = "none";
+  gameEl.style.display = "none";
+
+  overlayContent.innerHTML = `
+    <div style="margin-top:16px; display:grid; gap:14px;">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <button id="field2-bet-black">⚫ Schwarz</button>
+        <button id="field2-bet-white">⚪ Weiß</button>
+      </div>
+
+      <div id="field2-result" style="min-height:24px;">Wähle einen Einsatz.</div>
+
+      <div>
+        <div style="margin-bottom:8px;">🔢 Zahl 1–10</div>
+        <div id="field2-num-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px;">
+          ${Array.from({ length: 10 }, (_, i) =>
+            `<button class="field2-num-btn" data-num="${i + 1}">${i + 1}</button>`
+          ).join("")}
+        </div>
+      </div>
+
+      <button id="field2-restart">🔄 Neustart</button>
+    </div>
+  `;
+
+  document.getElementById("field2-bet-black").addEventListener("click", betColor);
+  document.getElementById("field2-bet-white").addEventListener("click", betColor);
+
+  document.getElementById("field2-num-grid").addEventListener("click", (e) => {
+    const btn = e.target.closest(".field2-num-btn");
+    if (!btn) return;
+    betNumber(Number(btn.dataset.num));
+  });
+
+  document.getElementById("field2-restart").addEventListener("click", resetField2);
+}
+
+function betColor() {
+  if (gameOver || coins < 1) return;
+  coins += Math.random() < 0.5 ? 1 : -1;
+  document.getElementById("field2-result").textContent = "Farbe gespielt.";
+  updateField2();
+}
+
+function betNumber(chosen) {
+  if (gameOver || coins < 1) return;
+
+  const drawn = Math.floor(Math.random() * 10) + 1;
+
+  if (chosen === drawn) {
+    coins += 10;
+    document.getElementById("field2-result").textContent = `🎉 Treffer! Die ${drawn} war richtig (+10)`;
+  } else {
+    coins -= 1;
+    document.getElementById("field2-result").textContent = `❌ Daneben. Gezogene Zahl: ${drawn} (−1)`;
+  }
+
+  updateField2();
+}
+
+function updateField2() {
+  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
+
+  if (coins >= 50) {
+    gameOver = true;
+    document.getElementById("field2-result").textContent = "🎉 Glückwunsch! Du hast 50 Münzen erreicht!";
+  } else if (coins <= 0) {
+    gameOver = true;
+    document.getElementById("field2-result").textContent = "💀 Keine Münzen mehr – Spiel vorbei.";
+  }
+}
+
+function resetField2() {
+  coins = 10;
+  gameOver = false;
+  renderField2();
+}
+
+document.getElementById("tile-2").addEventListener("click", () => {
+  resetField2();
+  openOverlay();
+});
