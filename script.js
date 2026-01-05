@@ -192,3 +192,140 @@ document.getElementById("next-question").addEventListener("click", function () {
 
   renderQuestion();
 });
+
+// ===============================
+// Overlay-Referenzen
+// ===============================
+const overlay = document.getElementById("overlay");
+const overlayTitle = document.getElementById("overlay-title");
+const overlayText = document.getElementById("overlay-text");
+const overlayContent = document.getElementById("overlay-content");
+
+// ===============================
+// Overlay öffnen / schließen
+// ===============================
+function openOverlay() {
+  overlay.style.display = "block";
+}
+
+function closeOverlay() {
+  overlay.style.display = "none";
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeOverlay();
+});
+
+// ===============================
+// Feld 2 – Glücksspiel
+// ===============================
+let coins = 10;
+let gameOver = false;
+
+function renderField2() {
+  overlayTitle.textContent = "🎲 Glücksspiel";
+  overlayText.textContent = `💰 Münzen: ${coins}`;
+
+  overlayContent.innerHTML = `
+    <div style="margin-top:16px; display:grid; gap:14px;">
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <button id="bet-black">⚫ Schwarz</button>
+        <button id="bet-white">⚪ Weiß</button>
+      </div>
+
+      <div id="result" style="min-height:24px;">Wähle einen Einsatz.</div>
+
+      <div>
+        <div style="margin-bottom:8px;">🔢 Zahl 1–10</div>
+        <div id="num-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px;">
+          ${Array.from({ length: 10 }, (_, i) =>
+            `<button class="num-btn" data-num="${i + 1}">${i + 1}</button>`
+          ).join("")}
+        </div>
+      </div>
+
+      <button id="restart">🔄 Neustart</button>
+      <button id="close">❌ Schließen</button>
+    </div>
+  `;
+
+  // Farbe setzen
+  document.getElementById("bet-black").addEventListener("click", () => betColor());
+  document.getElementById("bet-white").addEventListener("click", () => betColor());
+
+  // Zahlen setzen (Event Delegation)
+  document.getElementById("num-grid").addEventListener("click", (e) => {
+    const btn = e.target.closest(".num-btn");
+    if (!btn) return;
+    betNumber(Number(btn.dataset.num));
+  });
+
+  document.getElementById("restart").addEventListener("click", resetGame);
+  document.getElementById("close").addEventListener("click", closeOverlay);
+}
+
+// ===============================
+// Spiel-Logik
+// ===============================
+function betColor() {
+  if (gameOver || coins < 1) return;
+
+  coins += Math.random() < 0.5 ? 1 : -1;
+  document.getElementById("result").textContent =
+    coins > 0 ? "Farbe gespielt." : "Letzter Einsatz.";
+
+  updateGame();
+}
+
+function betNumber(chosen) {
+  if (gameOver || coins < 1) return;
+
+  const drawn = Math.floor(Math.random() * 10) + 1;
+
+  if (chosen === drawn) {
+    coins += 10;
+    document.getElementById("result").textContent =
+      `🎉 Treffer! Die ${drawn} war richtig (+10)`;
+  } else {
+    coins -= 1;
+    document.getElementById("result").textContent =
+      `❌ Daneben. Gezogene Zahl: ${drawn} (−1)`;
+  }
+
+  updateGame();
+}
+
+function updateGame() {
+  overlayText.textContent = `💰 Münzen: ${coins}`;
+
+  if (coins >= 50) {
+    gameOver = true;
+    document.getElementById("result").textContent =
+      "🎉 Glückwunsch! Du hast 50 Münzen erreicht!";
+  }
+
+  if (coins <= 0) {
+    gameOver = true;
+    document.getElementById("result").textContent =
+      "💀 Keine Münzen mehr – Spiel vorbei.";
+  }
+}
+
+function resetGame() {
+  coins = 10;
+  gameOver = false;
+  renderField2();
+}
+
+// ===============================
+// Feld 2 Tile Klick
+// ===============================
+document.getElementById("tile-2").addEventListener("click", () => {
+  resetGame();
+  openOverlay();
+});
+
+
