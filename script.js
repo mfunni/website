@@ -1,5 +1,29 @@
 // -------------------------
-// Spiel-Zustand
+// Overlay-Refs (NUR EINMAL)
+// -------------------------
+const overlay = document.getElementById("overlay");
+const overlayTitle = document.getElementById("overlay-title");
+const overlayText = document.getElementById("overlay-text");
+const overlayContent = document.getElementById("overlay-content");
+
+function openOverlay() {
+  overlay.style.display = "block";
+}
+
+function closeOverlay() {
+  overlay.style.display = "none";
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeOverlay();
+});
+
+document.getElementById("close").addEventListener("click", closeOverlay);
+
+// -------------------------
+// Trinkspiel-Zustand
 // -------------------------
 let playerCount = 0;
 let currentIndex = 0;
@@ -54,9 +78,6 @@ const questions = [
   { country: "Zypern", correct: "Nikosia", wrong: ["Athen", "Valletta", "Ankara"] },
 ];
 
-// -------------------------
-// Helfer: Shuffle + Optionen bauen
-// -------------------------
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -69,11 +90,6 @@ function buildOptions(q) {
   return shuffle([q.correct, ...q.wrong]);
 }
 
-// -------------------------
-// UI: Frage rendern
-// Voraussetzungen im HTML:
-// #question-text, #answers, #status
-// -------------------------
 function renderQuestion() {
   currentQuestion = questions[currentIndex];
   const options = buildOptions(currentQuestion);
@@ -83,8 +99,7 @@ function renderQuestion() {
 
   document.getElementById("status").textContent = "Wähle A–D:";
 
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = options
+  document.getElementById("answers").innerHTML = options
     .map((opt, idx) => {
       const letter = ["A", "B", "C", "D"][idx];
       return `
@@ -97,72 +112,52 @@ function renderQuestion() {
     .join("");
 }
 
-// -------------------------
-// Antworten-Klick (Event Delegation)
-// -------------------------
-document.getElementById("answers").addEventListener("click", function (e) {
+document.getElementById("answers").addEventListener("click", (e) => {
   const btn = e.target.closest(".answer-btn");
   if (!btn || !currentQuestion) return;
 
   const picked = btn.getAttribute("data-answer");
-
   if (picked === currentQuestion.correct) {
-  const randomPlayer = Math.floor(Math.random() * playerCount) + 1;
-
-  document.getElementById("status").textContent =
-    `✅ Richtig! Spieler ${randomPlayer} trinkt 🍺`;
-} else {
-  document.getElementById("status").textContent =
-    `❌ Falsch! Du trinkst 🍻 (Richtig wäre: ${currentQuestion.correct})`;
-}
-
+    const randomPlayer = Math.floor(Math.random() * playerCount) + 1;
+    document.getElementById("status").textContent = `✅ Richtig! Spieler ${randomPlayer} trinkt 🍺`;
+  } else {
+    document.getElementById("status").textContent =
+      `❌ Falsch! Du trinkst 🍻 (Richtig wäre: ${currentQuestion.correct})`;
+  }
 });
 
-// -------------------------
-// Overlay öffnen/schließen + Inhalte für Feld 1 und Feld 8
-// Voraussetzungen im HTML:
-// #overlay, #overlay-title, #overlay-text, #setup, #game, #game-message,
-// #player-count, #question-text, #answers, #status
-// -------------------------
-document.getElementById("tile-1").addEventListener("click", function () {
-  document.getElementById("overlay-title").textContent = "Trinkspiel";
-  document.getElementById("overlay-text").textContent = "";
+// Feld 1: Tile Klick
+document.getElementById("tile-1").addEventListener("click", () => {
+  overlayTitle.textContent = "Trinkspiel";
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
 
-  // Reset auf Setup-Ansicht
   document.getElementById("setup").style.display = "block";
   document.getElementById("game").style.display = "none";
+
   document.getElementById("game-message").textContent = "";
   document.getElementById("player-count").value = "";
   document.getElementById("question-text").textContent = "";
   document.getElementById("answers").innerHTML = "";
   document.getElementById("status").textContent = "";
 
-  document.getElementById("overlay").style.display = "block";
+  openOverlay();
 });
 
-document.getElementById("tile-8").addEventListener("click", function () {
-  document.getElementById("overlay-title").textContent = "Ragna ist cool!";
-  document.getElementById("overlay-text").textContent = "";
+// Feld 8
+document.getElementById("tile-8").addEventListener("click", () => {
+  overlayTitle.textContent = "Ragna ist cool!";
+  overlayText.textContent = "";
+  overlayContent.innerHTML = "";
 
-  // Setup/Game ausblenden
   document.getElementById("setup").style.display = "none";
   document.getElementById("game").style.display = "none";
-  document.getElementById("game-message").textContent = "";
-  document.getElementById("question-text").textContent = "";
-  document.getElementById("answers").innerHTML = "";
-  document.getElementById("status").textContent = "";
 
-  document.getElementById("overlay").style.display = "block";
+  openOverlay();
 });
 
-document.getElementById("close").addEventListener("click", function () {
-  document.getElementById("overlay").style.display = "none";
-});
-
-// -------------------------
-// Start: Spieleranzahl speichern + Spiel anzeigen + erste Frage
-// -------------------------
-document.getElementById("start-game").addEventListener("click", function () {
+// Start Spiel
+document.getElementById("start-game").addEventListener("click", () => {
   const count = Number(document.getElementById("player-count").value);
   const message = document.getElementById("game-message");
 
@@ -179,10 +174,8 @@ document.getElementById("start-game").addEventListener("click", function () {
   }
 });
 
-// -------------------------
 // Nächste Frage
-// -------------------------
-document.getElementById("next-question").addEventListener("click", function () {
+document.getElementById("next-question").addEventListener("click", () => {
   currentIndex++;
 
   if (currentIndex >= questions.length) {
@@ -194,67 +187,21 @@ document.getElementById("next-question").addEventListener("click", function () {
 });
 
 // ===============================
-// Overlay-Referenzen
+// Feld 2 – Glücksspiel
 // ===============================
-const overlay = document.getElementById("overlay");
-const overlayTitle = document.getElementById("overlay-title");
-const overlayText = document.getElementById("overlay-text");
-const overlayContent = document.getElementById("overlay-content");
-
-// ===============================
-// Overlay öffnen / schließen
-// ===============================
-function openOverlay() {
-  overlay.style.display = "block";
-}
-
-function closeOverlay() {
-  overlay.style.display = "none";
-  overlayText.textContent = "";
-  overlayContent.innerHTML = "";
-}
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeOverlay();
-});
-
-
-// ===============================
-// Overlay-Referenzen
-// ===============================
-const overlay = document.getElementById("overlay");
-const overlayTitle = document.getElementById("overlay-title");
-const overlayText = document.getElementById("overlay-text");
-const overlayContent = document.getElementById("overlay-content");
-
-// ===============================
-// Feld 2 – Glücksspiel (robust, ohne ID-Kollisionen)
-// ===============================
-const overlay = document.getElementById("overlay");
-const overlayTitle = document.getElementById("overlay-title");
-const overlayText = document.getElementById("overlay-text");
-const overlayContent = document.getElementById("overlay-content");
-
-function openOverlay() {
-  overlay.style.display = "block";
-}
-
-function closeOverlay() {
-  overlay.style.display = "none";
-  overlayText.textContent = "";
-  overlayContent.innerHTML = "";
-}
-
 let coins = 10;
 let gameOver = false;
 
 function renderField2() {
   overlayTitle.textContent = "🎲 Glücksspiel";
-  overlayText.textContent = `💰 Münzen: ${coins}`;
+  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
+
+  // Trinkspiel-UI ausblenden
+  document.getElementById("setup").style.display = "none";
+  document.getElementById("game").style.display = "none";
 
   overlayContent.innerHTML = `
     <div style="margin-top:16px; display:grid; gap:14px;">
-
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
         <button id="field2-bet-black">⚫ Schwarz</button>
         <button id="field2-bet-white">⚪ Weiß</button>
@@ -272,7 +219,6 @@ function renderField2() {
       </div>
 
       <button id="field2-restart">🔄 Neustart</button>
-      <button id="field2-close">❌ Schließen</button>
     </div>
   `;
 
@@ -285,16 +231,14 @@ function renderField2() {
     betNumber(Number(btn.dataset.num));
   });
 
-  document.getElementById("field2-restart").addEventListener("click", resetGame);
-  document.getElementById("field2-close").addEventListener("click", closeOverlay);
+  document.getElementById("field2-restart").addEventListener("click", resetField2);
 }
 
 function betColor() {
   if (gameOver || coins < 1) return;
-
   coins += Math.random() < 0.5 ? 1 : -1;
   document.getElementById("field2-result").textContent = "Farbe gespielt.";
-  updateGame();
+  updateField2();
 }
 
 function betNumber(chosen) {
@@ -304,44 +248,34 @@ function betNumber(chosen) {
 
   if (chosen === drawn) {
     coins += 10;
-    document.getElementById("field2-result").textContent =
-      `🎉 Treffer! Die ${drawn} war richtig (+10)`;
+    document.getElementById("field2-result").textContent = `🎉 Treffer! Die ${drawn} war richtig (+10)`;
   } else {
     coins -= 1;
-    document.getElementById("field2-result").textContent =
-      `❌ Daneben. Gezogene Zahl: ${drawn} (−1)`;
+    document.getElementById("field2-result").textContent = `❌ Daneben. Gezogene Zahl: ${drawn} (−1)`;
   }
 
-  updateGame();
+  updateField2();
 }
 
-function updateGame() {
-  overlayText.textContent = `💰 Münzen: ${coins}`;
+function updateField2() {
+  overlayText.innerHTML = `💰 Münzen: ${coins}<br><small>Ziel: 50 Münzen = Gewinn · 0 Münzen = verloren</small>`;
 
   if (coins >= 50) {
     gameOver = true;
-    document.getElementById("field2-result").textContent =
-      "🎉 Glückwunsch! Du hast 50 Münzen erreicht!";
+    document.getElementById("field2-result").textContent = "🎉 Glückwunsch! Du hast 50 Münzen erreicht!";
   } else if (coins <= 0) {
     gameOver = true;
-    document.getElementById("field2-result").textContent =
-      "💀 Keine Münzen mehr – Spiel vorbei.";
+    document.getElementById("field2-result").textContent = "💀 Keine Münzen mehr – Spiel vorbei.";
   }
 }
 
-function resetGame() {
+function resetField2() {
   coins = 10;
   gameOver = false;
   renderField2();
 }
 
-// Listener sicher setzen (auch wenn später umgebaut wird)
-document.addEventListener("DOMContentLoaded", () => {
-  const tile2 = document.getElementById("tile-2");
-  if (!tile2) return;
-
-  tile2.addEventListener("click", () => {
-    resetGame();
-    openOverlay();
-  });
+document.getElementById("tile-2").addEventListener("click", () => {
+  resetField2();
+  openOverlay();
 });
