@@ -1,73 +1,75 @@
 <!doctype html>
 <html lang="de">
-    <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Meine Seite</title>
-  <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-  <div id="grid">
-    <div class="tile" id="tile-1"><img src="trinkspiel-icon.png"alt="Trinkspiel">
-    </div>    
-   <div class="tile" id="tile-2">
-   <img src="img/tile2.png" alt="Feld 2">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meine Seite</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <div id="grid">
+      <div class="tile" id="tile-1">
+        <img src="trinkspiel-icon.png" alt="Trinkspiel">
+      </div>
+
+      <div class="tile" id="tile-2">
+        <img src="img/tile2.png" alt="Feld 2">
+      </div>
+
+      <div class="tile" id="tile-3">Feld 3</div>
+      <div class="tile" id="tile-4">Feld 4</div>
+      <div class="tile" id="tile-5">Feld 5</div>
+      <div class="tile" id="tile-6">Feld 6</div>
+      <div class="tile" id="tile-7">Feld 7</div>
+
+      <div class="tile" id="tile-8">Feld 8</div>
     </div>
-    <div class="tile">Feld 3</div>
-    <div class="tile">Feld 4</div>
-    <div class="tile">Feld 5</div>
-    <div class="tile">Feld 6</div>
-    <div class="tile">Feld 7</div>
-    <div class="tile" id="tile-8">Feld 8</div>
-<div id="overlay" style="
-  display:none;
-  position: fixed;
-  inset: 0;
-  background: white;
-  padding: 20px;
-  z-index: 1000;
-">
-  <h1 id="overlay-title">Trinkspiel</h1>
-  <p id="overlay-text"></p>
-  <div id="overlay-content"></div>
-</div>
-  <!-- Setup -->
-  <div id="setup">
-    <p>Falsche Antwort: Der Antwortende trinkt.
-Richtige Antwort: Ein zufällig ausgewählter Spieler trinkt.</p>
-    <input
-      id="player-count"
-      type="number"
-      min="1"
-      max="9"
-      placeholder="1–9"
-    />
-    <br><br>
-    <button id="start-game">Start</button>
-    <p id="game-message"></p>
-  </div>
-  <!-- Game -->
-  <div id="game" style="display:none;">
-    <p id="question-text"></p>
-    <div id="answers"></div>
-    <p id="status"></p>
-    <button id="next-question">Nächste Frage</button>
-  </div>
-  <button id="close">Zurück</button>
-</div>
-<div id="setup">
-  <p id="game-message"></p>
-</div>
-<div id="game" style="display:none;">
-  <p id="question-text"></p>
-  <p id="status"></p>
-  <button id="next-question">Nächste Frage</button>
-</div>
-</div>
-   <script src="script.js?v=22"></script>     
-</body>
+
+    <!-- Overlay -->
+    <div id="overlay" style="
+      display:none;
+      position: fixed;
+      inset: 0;
+      background: white;
+      padding: 20px;
+      z-index: 1000;
+    ">
+      <h1 id="overlay-title">Trinkspiel</h1>
+      <p id="overlay-text"></p>
+      <div id="overlay-content"></div>
+
+      <!-- Trinkspiel Setup -->
+      <div id="setup">
+        <p>
+          Falsche Antwort: Der Antwortende trinkt.<br>
+          Richtige Antwort: Ein zufällig ausgewählter Spieler trinkt.
+        </p>
+
+        <input
+          id="player-count"
+          type="number"
+          min="1"
+          max="9"
+          placeholder="1–9"
+        />
+
+        <br><br>
+        <button id="start-game">Start</button>
+        <p id="game-message"></p>
+      </div>
+
+      <!-- Trinkspiel Game -->
+      <div id="game" style="display:none;">
+        <p id="question-text"></p>
+        <div id="answers"></div>
+        <p id="status"></p>
+        <button id="next-question">Nächste Frage</button>
+      </div>
+
+      <button id="close">Zurück</button>
+    </div>
+
+    <script src="script.js?v=22"></script>
+  </body>
 </html>
-      
-    
-      
-   
