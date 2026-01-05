@@ -50,8 +50,8 @@ body {
   justify-content: center;
 }
 #title-1 img {
-  max-width: 85%;
-  max-height: 85%;
+  max-width: 50%;
+  max-height: 50%;
   width: auto;
   height: auto;
   object-fit: contain;
