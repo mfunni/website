@@ -10,7 +10,9 @@
   <div id="grid">
     <div class="tile" id="tile-1"><img src="trinkspiel-icon.png"alt="Trinkspiel">
     </div>    
-    <div class="tile">Feld 2</div>
+   <div class="tile" id="tile-2">
+   <img src="img/tile2.png" alt="Feld 2">
+    </div>
     <div class="tile">Feld 3</div>
     <div class="tile">Feld 4</div>
     <div class="tile">Feld 5</div>
@@ -25,15 +27,14 @@
   padding: 20px;
   z-index: 1000;
 ">
-
   <h1 id="overlay-title">Trinkspiel</h1>
   <p id="overlay-text"></p>
-
+  <div id="overlay-content"></div>
+</div>
   <!-- Setup -->
   <div id="setup">
     <p>Falsche Antwort: Der Antwortende trinkt.
 Richtige Antwort: Ein zufällig ausgewählter Spieler trinkt.</p>
-
     <input
       id="player-count"
       type="number"
@@ -41,28 +42,19 @@ Richtige Antwort: Ein zufällig ausgewählter Spieler trinkt.</p>
       max="9"
       placeholder="1–9"
     />
-
     <br><br>
-
     <button id="start-game">Start</button>
     <p id="game-message"></p>
   </div>
-
   <!-- Game -->
   <div id="game" style="display:none;">
     <p id="question-text"></p>
-
     <div id="answers"></div>
-
     <p id="status"></p>
-
     <button id="next-question">Nächste Frage</button>
   </div>
-
   <button id="close">Zurück</button>
-
 </div>
-
 <div id="setup">
   <p id="game-message"></p>
 </div>
@@ -74,7 +66,6 @@ Richtige Antwort: Ein zufällig ausgewählter Spieler trinkt.</p>
 </div>
    <script src="script.js?v=15"></script>     
 </body>
-
 </html>
       
     
