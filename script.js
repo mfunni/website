@@ -146,7 +146,7 @@ document.getElementById("tile-1").addEventListener("click", () => {
 
 // Feld 8
 document.getElementById("tile-8").addEventListener("click", () => {
-  overlayTitle.textContent = "Ragna ist cool!";
+  overlayTitle.textContent = "Giri ist cool!";
   overlayText.textContent = "";
   overlayContent.innerHTML = "";
 
