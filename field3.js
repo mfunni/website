@@ -21,9 +21,7 @@ const LATEST_ID = 1;
 
 async function renderField3() {
   // Grund-UI
-  overlayTitle.textContent = "📷 Globales Bild";
-  overlayText.innerHTML = `
-    <p>Jeder sieht hier immer das <strong>zuletzt hochgeladene</strong> Bild.<br></p>`;
+  overlayText.innerHTML = `<p>📷 Jeder sieht hier immer das <strong>zuletzt hochgeladene</strong> Bild.<br></p>`;
 
   // Trinkspiel-UI ausblenden (falls im Overlay vorhanden)
   const setupEl = document.getElementById("setup");
