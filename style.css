@@ -68,3 +68,16 @@ body {
   object-fit: contain !important;
   display: block;
 }
+
+#tile-3 {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#tile-3 img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block;
+}
