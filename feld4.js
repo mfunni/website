@@ -1,64 +1,75 @@
 // feld4.js
 
-let tile4 = null;
-let overlay = null;
+// Supabase Daten (aus deinem Memory)
+const SUPABASE_URL = "https://skkdkgirllqyxkyalzfb.supabase.co";
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || ""; // besser: anon key global setzen (siehe Hinweis unten)
 
-
-// 1) Supabase Client holen oder erstellen (wie Feld 3)
 function getSupabaseClient() {
   if (window.supabaseClient) return window.supabaseClient;
 
-  // Falls du keine globale Instanz verwendest, aber SUPABASE_URL + SUPABASE_ANON_KEY global existieren:
-  if (typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined") {
-    // supabase-js v2: createClient kommt entweder global oder über window.supabase
-    const create =
-      (typeof createClient !== "undefined" && createClient) ||
-      (window.supabase && window.supabase.createClient);
-
-    if (!create) {
-      console.error("Supabase createClient nicht gefunden. Stelle sicher, dass supabase-js eingebunden ist.");
+  // supabase-js v2 via CDN: window.supabase.createClient(...)
+  if (window.supabase && window.supabase.createClient) {
+    if (!SUPABASE_ANON_KEY) {
+      console.error("SUPABASE_ANON_KEY fehlt. Setze ihn global in script.js oder in einer config.");
       return null;
     }
-
-    const client = create(SUPABASE_URL, SUPABASE_ANON_KEY);
-    window.supabaseClient = client; // optional cachen
-    return client;
+    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return window.supabaseClient;
   }
 
-  console.error("Supabase Konfiguration fehlt (window.supabaseClient ODER SUPABASE_URL + SUPABASE_ANON_KEY).");
+  console.error("Supabase SDK nicht gefunden. Stelle sicher, dass supabase-js eingebunden ist.");
   return null;
 }
 
 let saveTimer = null;
 
-tile4.addEventListener("click", () => {
-  openNotes();
+document.addEventListener("DOMContentLoaded", () => {
+  const tile4 = document.getElementById("tile-4");
+  if (!tile4) {
+    console.log("tile-4 nicht gefunden");
+    return;
+  }
+
+  tile4.addEventListener("click", () => {
+    openNotes();
+  });
 });
 
-async function openNotes() {
-  overlay.classList.add("active");
+function openNotes() {
+  const overlay = document.getElementById("overlay");
+  const titleEl = document.getElementById("overlay-title");
+  const contentEl = document.getElementById("overlay-content");
+  const closeBtn = document.getElementById("close");
+  const setup = document.getElementById("setup");
+  const game = document.getElementById("game");
 
-  overlay.innerHTML = `
-    <div class="overlay-content">
-      <h2>Notizen</h2>
+  // Overlay sichtbar machen (weil bei dir inline display:none steht!)
+  overlay.style.display = "block";
 
-      <div id="save-status" style="margin: 10px 0; font-size: 14px; opacity: 0.8;"></div>
+  // Trinkspiel-Bereiche verstecken
+  if (setup) setup.style.display = "none";
+  if (game) game.style.display = "none";
 
-      <div class="notes-container">
-        ${createNoteLines()}
-      </div>
+  // Titel + Content setzen
+  if (titleEl) titleEl.textContent = "Notizen";
 
-      <button id="close-overlay">Schließen</button>
+  contentEl.innerHTML = `
+    <div id="save-status" style="margin:10px 0; font-size:14px; opacity:.8;"></div>
+    <div class="notes-container">
+      ${createNoteLines()}
     </div>
   `;
 
-  document.getElementById("close-overlay").addEventListener("click", closeOverlay);
+  // close Button: nicht doppelt Listener stapeln
+  closeBtn.onclick = () => closeOverlay();
 
-  // Auto-Save beim Tippen (debounced)
-  getNoteInputs().forEach((inp) => inp.addEventListener("input", scheduleSave));
+  // Auto-save
+  getNoteInputs().forEach((inp) => {
+    inp.addEventListener("input", scheduleSave);
+  });
 
   // Laden
-  await loadNotesFromSupabase();
+  loadNotesFromSupabase();
 }
 
 function createNoteLines() {
@@ -95,8 +106,7 @@ function normalizeNotes(notes) {
 }
 
 function fillInputs(notesArr) {
-  const inputs = getNoteInputs();
-  inputs.forEach((inp, idx) => {
+  getNoteInputs().forEach((inp, idx) => {
     inp.value = (notesArr[idx] || "").slice(0, 30);
   });
 }
@@ -114,7 +124,6 @@ async function loadNotesFromSupabase() {
 
   setStatus("Lade…");
 
-  // Wir nutzen eine feste Zeile id=1 als globalen Speicher
   const { data, error } = await supabase
     .from("field4_notes")
     .select("notes")
@@ -122,12 +131,12 @@ async function loadNotesFromSupabase() {
     .single();
 
   if (error) {
-    // Falls die Zeile noch nicht existiert: anlegen
+    // falls row fehlt -> anlegen
     const emptyNotes = Array(10).fill("");
     const up = await supabase.from("field4_notes").upsert({ id: 1, notes: emptyNotes });
 
     if (up.error) {
-      console.error("loadNotes error:", error, "upsert error:", up.error);
+      console.error("load error:", error, "upsert error:", up.error);
       setStatus("Fehler beim Laden/Anlegen.");
       return;
     }
@@ -137,18 +146,14 @@ async function loadNotesFromSupabase() {
     return;
   }
 
-  const normalized = normalizeNotes(data?.notes);
-  fillInputs(normalized);
+  fillInputs(normalizeNotes(data?.notes));
   setStatus("Bereit.");
 }
 
 function scheduleSave() {
   setStatus("Änderungen…");
-
   if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    saveNotesToSupabase();
-  }, 500);
+  saveTimer = setTimeout(saveNotesToSupabase, 500);
 }
 
 async function saveNotesToSupabase() {
@@ -158,15 +163,14 @@ async function saveNotesToSupabase() {
     return;
   }
 
-  const notes = collectNotes();
   setStatus("Speichere…");
 
   const { error } = await supabase
     .from("field4_notes")
-    .upsert({ id: 1, notes });
+    .upsert({ id: 1, notes: collectNotes() });
 
   if (error) {
-    console.error("saveNotes error:", error);
+    console.error("save error:", error);
     setStatus("Speichern fehlgeschlagen.");
     return;
   }
@@ -175,23 +179,19 @@ async function saveNotesToSupabase() {
 }
 
 function closeOverlay() {
-  overlay.classList.remove("active");
-  overlay.innerHTML = "";
+  const overlay = document.getElementById("overlay");
+  const contentEl = document.getElementById("overlay-content");
+  const setup = document.getElementById("setup");
+
+  // Overlay aus
+  overlay.style.display = "none";
+
+  // Content leeren (optional)
+  if (contentEl) contentEl.innerHTML = "";
+
+  // Trinkspiel Setup wieder zeigen (damit Feld 1 normal bleibt)
+  if (setup) setup.style.display = "block";
+
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = null;
 }
-document.addEventListener("DOMContentLoaded", () => {
-  tile4 = document.getElementById("tile-4");
-  overlay = document.getElementById("overlay");
-
-  console.log("feld4.js geladen");
-  console.log("tile-4 gefunden?", !!tile4);
-  console.log("overlay gefunden?", !!overlay);
-
-  if (!tile4 || !overlay) return;
-
-  tile4.addEventListener("click", () => {
-    console.log("tile-4 klick");
-    openNotes(); // deine bestehende openNotes Funktion
-  });
-});
