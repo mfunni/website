@@ -6,7 +6,7 @@
     <title>Meine Seite</title>
 
     <!-- CSS nur einmal, mit Version -->
-    <link rel="stylesheet" href="style.css?v=42">
+    <link rel="stylesheet" href="style.css?v=43">
   </head>
 
   <body>
@@ -30,7 +30,15 @@
     </div>
 
     <!-- Overlay -->
-    <div id="overlay" class="overlay">
+    <div id="overlay" style="
+  display:none;
+  position: fixed;
+  inset: 0;
+  background: white;
+  padding: 20px;
+  z-index: 1000;
+">
+
 
       <h1 id="overlay-title">Trinkspiel</h1>
       <p id="overlay-text"></p>
@@ -62,8 +70,8 @@
     </div>
 
     <!-- JS nur einmal, ganz unten -->
-    <script src="script.js?v=42"></script>
-    <script src="field3.js?v=42"></script>
-    <script src="feld4.js?v=42"></script>
+    <script src="script.js?v=43"></script>
+    <script src="field3.js?v=43"></script>
+    <script src="feld4.js?v=43"></script>
   </body>
 </html>
