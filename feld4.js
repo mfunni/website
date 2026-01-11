@@ -1,7 +1,8 @@
 // feld4.js
 
-const tile4 = document.getElementById("tile-4");
-const overlay = document.getElementById("overlay");
+let tile4 = null;
+let overlay = null;
+
 
 // 1) Supabase Client holen oder erstellen (wie Feld 3)
 function getSupabaseClient() {
@@ -179,3 +180,18 @@ function closeOverlay() {
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = null;
 }
+document.addEventListener("DOMContentLoaded", () => {
+  tile4 = document.getElementById("tile-4");
+  overlay = document.getElementById("overlay");
+
+  console.log("feld4.js geladen");
+  console.log("tile-4 gefunden?", !!tile4);
+  console.log("overlay gefunden?", !!overlay);
+
+  if (!tile4 || !overlay) return;
+
+  tile4.addEventListener("click", () => {
+    console.log("tile-4 klick");
+    openNotes(); // deine bestehende openNotes Funktion
+  });
+});
