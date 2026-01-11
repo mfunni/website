@@ -1,95 +1,139 @@
-// feld4.js
+// feld4.js — komplette, saubere Version für DEIN HTML
 
-// Supabase Daten (aus deinem Memory)
+// === KONFIG ===
+// Supabase Daten (die hast du bereits)
 const SUPABASE_URL = "https://skkdkgirllqyxkyalzfb.supabase.co";
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || ""; // besser: anon key global setzen (siehe Hinweis unten)
+// anon key MUSS global gesetzt sein, z.B. in script.js:
+// window.SUPABASE_ANON_KEY = "xxxxx";
 
-function getSupabaseClient() {
-  if (window.supabaseClient) return window.supabaseClient;
-
-  // supabase-js v2 via CDN: window.supabase.createClient(...)
-  if (window.supabase && window.supabase.createClient) {
-    if (!SUPABASE_ANON_KEY) {
-      console.error("SUPABASE_ANON_KEY fehlt. Setze ihn global in script.js oder in einer config.");
-      return null;
-    }
-    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    return window.supabaseClient;
-  }
-
-  console.error("Supabase SDK nicht gefunden. Stelle sicher, dass supabase-js eingebunden ist.");
-  return null;
-}
-
+let supabaseClient = null;
 let saveTimer = null;
 
+// === INIT ===
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("feld4.js geladen");
+
   const tile4 = document.getElementById("tile-4");
   if (!tile4) {
-    console.log("tile-4 nicht gefunden");
+    console.error("tile-4 nicht gefunden");
     return;
   }
 
   tile4.addEventListener("click", () => {
+    console.log("tile-4 klick");
     openNotes();
   });
 });
 
+// === SUPABASE ===
+function getSupabaseClient() {
+  if (supabaseClient) return supabaseClient;
+
+  if (!window.supabase || !window.supabase.createClient) {
+    console.error("Supabase SDK nicht geladen");
+    return null;
+  }
+
+  if (!window.SUPABASE_ANON_KEY) {
+    console.error("SUPABASE_ANON_KEY fehlt (global setzen!)");
+    return null;
+  }
+
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
+
+  return supabaseClient;
+}
+
+// === OVERLAY LOGIK ===
 function openNotes() {
   const overlay = document.getElementById("overlay");
-  const titleEl = document.getElementById("overlay-title");
-  const contentEl = document.getElementById("overlay-content");
+  const title = document.getElementById("overlay-title");
+  const content = document.getElementById("overlay-content");
   const closeBtn = document.getElementById("close");
   const setup = document.getElementById("setup");
   const game = document.getElementById("game");
 
-  // Overlay sichtbar machen (weil bei dir inline display:none steht!)
+  if (!overlay || !content || !title) {
+    console.error("Overlay-Elemente fehlen");
+    return;
+  }
+
+  // Overlay sichtbar machen (WICHTIG bei deinem HTML)
   overlay.style.display = "block";
 
-  // Trinkspiel-Bereiche verstecken
+  // Trinkspiel verstecken
   if (setup) setup.style.display = "none";
   if (game) game.style.display = "none";
 
-  // Titel + Content setzen
-  if (titleEl) titleEl.textContent = "Notizen";
+  // Titel setzen
+  title.textContent = "Notizen";
 
-  contentEl.innerHTML = `
-    <div id="save-status" style="margin:10px 0; font-size:14px; opacity:.8;"></div>
+  // Content setzen
+  content.innerHTML = `
+    <div id="save-status" style="margin-bottom:10px;font-size:14px;opacity:.8;"></div>
     <div class="notes-container">
-      ${createNoteLines()}
+      ${createNoteInputs()}
     </div>
   `;
 
-  // close Button: nicht doppelt Listener stapeln
-  closeBtn.onclick = () => closeOverlay();
+  // Close-Button (nicht mehrfach!)
+  closeBtn.onclick = closeNotes;
 
-  // Auto-save
-  getNoteInputs().forEach((inp) => {
-    inp.addEventListener("input", scheduleSave);
+  // Autosave
+  document.querySelectorAll(".note-line").forEach((input) => {
+    input.addEventListener("input", scheduleSave);
   });
 
   // Laden
-  loadNotesFromSupabase();
+  loadNotes();
 }
 
-function createNoteLines() {
+function closeNotes() {
+  const overlay = document.getElementById("overlay");
+  const content = document.getElementById("overlay-content");
+  const setup = document.getElementById("setup");
+
+  overlay.style.display = "none";
+  content.innerHTML = "";
+
+  // Trinkspiel wieder zeigen (für Feld 1)
+  if (setup) setup.style.display = "block";
+
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = null;
+}
+
+// === NOTIZEN ===
+function createNoteInputs() {
   let html = "";
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 0; i < 10; i++) {
     html += `
       <input
+        class="note-line"
         type="text"
         maxlength="30"
-        placeholder="Notiz ${i}"
-        class="note-line"
-        data-index="${i - 1}"
-      />
+        placeholder="Notiz ${i + 1}"
+        data-index="${i}"
+        style="display:block;width:100%;margin-bottom:8px;padding:6px;"
+      >
     `;
   }
   return html;
 }
 
-function getNoteInputs() {
-  return Array.from(document.querySelectorAll(".note-line"));
+function collectNotes() {
+  return Array.from(document.querySelectorAll(".note-line"))
+    .map((i) => (i.value || "").slice(0, 30));
+}
+
+function fillNotes(notes) {
+  const inputs = document.querySelectorAll(".note-line");
+  for (let i = 0; i < inputs.length; i++) {
+    inputs[i].value = (notes[i] || "").slice(0, 30);
+  }
 }
 
 function setStatus(text) {
@@ -97,28 +141,11 @@ function setStatus(text) {
   if (el) el.textContent = text;
 }
 
-function normalizeNotes(notes) {
-  const arr = Array(10).fill("");
-  for (let i = 0; i < 10; i++) {
-    arr[i] = ((notes && notes[i]) ? String(notes[i]) : "").slice(0, 30);
-  }
-  return arr;
-}
-
-function fillInputs(notesArr) {
-  getNoteInputs().forEach((inp, idx) => {
-    inp.value = (notesArr[idx] || "").slice(0, 30);
-  });
-}
-
-function collectNotes() {
-  return getNoteInputs().map((inp) => (inp.value || "").toString().slice(0, 30));
-}
-
-async function loadNotesFromSupabase() {
+// === SUPABASE IO ===
+async function loadNotes() {
   const supabase = getSupabaseClient();
   if (!supabase) {
-    setStatus("Supabase nicht verfügbar.");
+    setStatus("Supabase nicht verfügbar");
     return;
   }
 
@@ -131,67 +158,52 @@ async function loadNotesFromSupabase() {
     .single();
 
   if (error) {
-    // falls row fehlt -> anlegen
-    const emptyNotes = Array(10).fill("");
-    const up = await supabase.from("field4_notes").upsert({ id: 1, notes: emptyNotes });
+    // Falls Zeile noch nicht existiert → anlegen
+    const empty = Array(10).fill("");
+    const up = await supabase
+      .from("field4_notes")
+      .upsert({ id: 1, notes: empty });
 
     if (up.error) {
-      console.error("load error:", error, "upsert error:", up.error);
-      setStatus("Fehler beim Laden/Anlegen.");
+      console.error("Supabase Fehler:", up.error);
+      setStatus("Fehler beim Laden");
       return;
     }
 
-    fillInputs(emptyNotes);
-    setStatus("Bereit.");
+    fillNotes(empty);
+    setStatus("Bereit");
     return;
   }
 
-  fillInputs(normalizeNotes(data?.notes));
-  setStatus("Bereit.");
+  fillNotes(Array.isArray(data.notes) ? data.notes : []);
+  setStatus("Bereit");
 }
 
 function scheduleSave() {
   setStatus("Änderungen…");
   if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveNotesToSupabase, 500);
+  saveTimer = setTimeout(saveNotes, 500);
 }
 
-async function saveNotesToSupabase() {
+async function saveNotes() {
   const supabase = getSupabaseClient();
   if (!supabase) {
-    setStatus("Supabase nicht verfügbar.");
+    setStatus("Supabase nicht verfügbar");
     return;
   }
 
+  const notes = collectNotes();
   setStatus("Speichere…");
 
   const { error } = await supabase
     .from("field4_notes")
-    .upsert({ id: 1, notes: collectNotes() });
+    .upsert({ id: 1, notes });
 
   if (error) {
-    console.error("save error:", error);
-    setStatus("Speichern fehlgeschlagen.");
+    console.error("Speichern fehlgeschlagen:", error);
+    setStatus("Speichern fehlgeschlagen");
     return;
   }
 
-  setStatus("Gespeichert.");
-}
-
-function closeOverlay() {
-  const overlay = document.getElementById("overlay");
-  const contentEl = document.getElementById("overlay-content");
-  const setup = document.getElementById("setup");
-
-  // Overlay aus
-  overlay.style.display = "none";
-
-  // Content leeren (optional)
-  if (contentEl) contentEl.innerHTML = "";
-
-  // Trinkspiel Setup wieder zeigen (damit Feld 1 normal bleibt)
-  if (setup) setup.style.display = "block";
-
-  if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = null;
+  setStatus("Gespeichert");
 }
