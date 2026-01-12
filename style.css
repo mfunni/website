@@ -81,3 +81,16 @@ body {
   object-fit: contain !important;
   display: block;
 }
+
+#tile-4 {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#tile-4 img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block;
+}
